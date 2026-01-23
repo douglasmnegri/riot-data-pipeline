@@ -1,1 +1,61 @@
-.venv
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# =========================
+# Environment variables / secrets
+# =========================
+.env
+.env.*
+*.env
+
+# =========================
+# Data files (local only)
+# =========================
+data/
+*.json
+*.csv
+*.parquet
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# Airflow (when you add it)
+# =========================
+airflow/logs/
+airflow/dags/__pycache__/
+airflow/plugins/__pycache__/
+airflow/*.db
+airflow/*.cfg
+
+# =========================
+# OS / IDE
+# =========================
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# =========================
+# Jupyter / notebooks
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Build / packaging
+# =========================
+build/
+dist/
+*.egg-info/
