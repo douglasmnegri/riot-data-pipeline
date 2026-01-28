@@ -1,9 +1,13 @@
 import os
 import time
 import requests
+from typing import Optional, Dict, Any
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-def get_json(url: str, params: dict | None = None) -> dict:
+def get_json(url: str, params: Optional[Dict[str, Any]] = None) -> dict:
     """Fetch JSON data from Riot API with retry and basic error handling."""
     api_key = os.getenv("RIOT_API_KEY")
     if not api_key:

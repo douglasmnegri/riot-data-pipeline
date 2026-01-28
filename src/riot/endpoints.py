@@ -1,11 +1,16 @@
 import os
+from typing import Optional
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def get_rank_entries(
     queue: str,
     tier: str,
     division: str,
-    page: int | None = None,
+    page: Optional[int] = None,
 ) -> str:
     """Construct the endpoint URL for fetching ranked entries
     using league-exp-v4.
