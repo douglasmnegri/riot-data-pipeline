@@ -35,6 +35,3 @@ def extract_rank_entries(
         json.dump(all_entries, f, indent=2)
 
     return str(output)
-
-
-extract_rank_entries("RANKED_SOLO_5x5", "CHALLENGER", "I")
