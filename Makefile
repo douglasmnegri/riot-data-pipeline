@@ -1,8 +1,10 @@
 .PHONY: help venv install run lint format test clean
+.ONESHELL:
 
 PYTHON := python3
 VENV := .venv
-ACTIVATE := source $(VENV)/bin/activate
+ACTIVATE := . $(VENV)/bin/activate
+export PYTHONPATH := src
 
 help:
 	@echo "Available commands:"
@@ -17,20 +19,25 @@ help:
 venv:
 	$(PYTHON) -m venv $(VENV)
 
-install:
-	$(ACTIVATE) && pip install -r requirements.txt
+install: venv
+	$(ACTIVATE)
+	pip install -r requirements.txt
 
 run:
-	$(ACTIVATE) && python src/extract.py
+	$(ACTIVATE)
+	python -m riot.extract
 
 lint:
-	$(ACTIVATE) && ruff check src
+	$(ACTIVATE)
+	ruff check src
 
 format:
-	$(ACTIVATE) && ruff format src
+	$(ACTIVATE)
+	ruff format src
 
 test:
-	$(ACTIVATE) && pytest
+	$(ACTIVATE)
+	pytest
 
 clean:
-	rm -rf __pycache__ .pytest_cache .ruff_cache
+	rm -rf __pycache__ .pytest_cache .ruff_cache $(VENV)
