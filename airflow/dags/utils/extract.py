@@ -2,8 +2,8 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from riot.client import get_json
-from riot.endpoints import get_rank_entries
+from utils.client import get_json
+from utils.endpoints import get_rank_entries
 
 
 DATA_DIR = Path("data/raw")
