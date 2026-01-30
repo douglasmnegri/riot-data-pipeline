@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
-from riot.extract import extract_rank_entries
+from utils.extract import extract_rank_entries
 
 
 CONFIG_PATH = "/opt/airflow/dags/rank_entries/configs/rank_entries_jobs.json"
