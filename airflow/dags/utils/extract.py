@@ -4,7 +4,7 @@ from pathlib import Path
 
 from utils.client import get_json
 from utils.endpoints import get_rank_entries
-
+from utils.endpoints import get_player_champion_data
 
 DATA_DIR = Path("data/raw")
 
@@ -33,5 +33,21 @@ def extract_rank_entries(
 
     with output.open("w") as f:
         json.dump(all_entries, f, indent=2)
+
+    return str(output)
+
+
+def extract_champion_mastery_entries(player_puuid: str) -> str:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    response = get_json(get_player_champion_data(player_puuid))
+
+    if not response:
+        raise ValueError(f"No champion mastery data for player {player_puuid}")
+
+    output = DATA_DIR / f"{player_puuid}.json"
+
+    with output.open("w", encoding="utf-8") as f:
+        json.dump(response, f, indent=2)
 
     return str(output)

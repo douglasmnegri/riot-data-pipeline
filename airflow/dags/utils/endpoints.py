@@ -25,3 +25,18 @@ def get_rank_entries(
         url += f"?page={page}"
 
     return url
+
+
+def get_player_champion_data(player_puuid: str) -> str:
+    """Construct the endpoint URL for fetching player data
+    using summoner-v4.
+    """
+    base_url = os.getenv("BASE_URL")
+    if not base_url:
+        raise ValueError("BASE_URL environment variable is not set.")
+
+    url = (
+        f"{base_url}/lol/champion-mastery/v4/champion-masteries/by-puuid/{player_puuid}"
+    )
+
+    return url
