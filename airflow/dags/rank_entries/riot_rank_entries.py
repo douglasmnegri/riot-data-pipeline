@@ -5,6 +5,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from utils.extract import extract_rank_entries
+from utils.extract import extract_champion_mastery_entries
 
 
 CONFIG_PATH = "/opt/airflow/dags/rank_entries/configs/rank_entries_jobs.json"
@@ -24,7 +25,7 @@ def load_jobs_config(path: str):
 
 with DAG(
     dag_id="riot_rank_entries",
-    description="Extract ranked entries from Riot API",
+    description="Extract ranked entries and champion mastery from Riot API",
     default_args=default_args,
     start_date=datetime(2026, 1, 1),
     schedule_interval=None,
@@ -34,8 +35,8 @@ with DAG(
     jobs = load_jobs_config(CONFIG_PATH)
 
     for job in jobs:
-        PythonOperator(
-            task_id=f"extract_{job['task_suffix']}",
+        rank_task = PythonOperator(
+            task_id=f"extract_rank_{job['task_suffix']}",
             python_callable=extract_rank_entries,
             op_kwargs={
                 "queue": job["queue"],
@@ -43,3 +44,17 @@ with DAG(
                 "division": job["division"],
             },
         )
+
+        mastery_task = PythonOperator(
+            task_id=f"extract_champion_mastery_{job['task_suffix']}",
+            python_callable=extract_champion_mastery_entries,
+            op_kwargs={
+                "puuid_file": (
+                    "{{ ti.xcom_pull(task_ids='extract_rank_"
+                    + job["task_suffix"]
+                    + "') }}"
+                ),
+            },
+        )
+
+        rank_task >> mastery_task

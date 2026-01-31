@@ -1,4 +1,5 @@
 import json
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -19,35 +20,55 @@ def extract_rank_entries(
 
     while True:
         response = get_json(get_rank_entries(queue, tier, division, page=page))
-
         if not response:
             break
-
         all_entries.extend(response)
         page += 1
 
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-
     ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    output = DATA_DIR / f"{queue}_{tier}_{division}_{ts}.json"
 
-    with output.open("w") as f:
+    rank_dir = DATA_DIR / "rank"
+    puuid_dir = DATA_DIR / "puuids"
+
+    rank_dir.mkdir(parents=True, exist_ok=True)
+    puuid_dir.mkdir(parents=True, exist_ok=True)
+
+    rank_file = rank_dir / f"{queue}_{tier}_{division}_{ts}.json"
+    puuid_file = puuid_dir / f"{queue}_{tier}_{division}_{ts}.json"
+
+    puuids = sorted({entry["puuid"] for entry in all_entries})
+
+    with rank_file.open("w", encoding="utf-8") as f:
         json.dump(all_entries, f, indent=2)
 
-    return str(output)
+    with puuid_file.open("w", encoding="utf-8") as f:
+        json.dump(puuids, f, indent=2)
+
+    return str(puuid_file)
 
 
-def extract_champion_mastery_entries(player_puuid: str) -> str:
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+def extract_champion_mastery_entries(puuid_file: str) -> None:
+    puuid_path = Path(puuid_file)
 
-    response = get_json(get_player_champion_data(player_puuid))
+    with puuid_path.open("r", encoding="utf-8") as f:
+        puuids: list[str] = json.load(f)
 
-    if not response:
-        raise ValueError(f"No champion mastery data for player {player_puuid}")
+    mastery_dir = DATA_DIR / "champion_mastery"
+    mastery_dir.mkdir(parents=True, exist_ok=True)
 
-    output = DATA_DIR / f"{player_puuid}.json"
+    for puuid in puuids:
+        output = mastery_dir / f"{puuid}.json"
 
-    with output.open("w", encoding="utf-8") as f:
-        json.dump(response, f, indent=2)
+        # idempotency = Airflow retries won't re-hit API
+        if output.exists():
+            continue
 
-    return str(output)
+        response = get_json(get_player_champion_data(puuid))
+        if not response:
+            continue
+
+        with output.open("w", encoding="utf-8") as f:
+            json.dump(response, f, indent=2)
+
+        # Rate liminting protection (Riot API allows 100 requests every 2 minutes)
+        time.sleep(2)
