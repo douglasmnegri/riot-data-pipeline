@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
-from utils.extract import extract_champion_mastery_entries
+from utils.extract import extract_progressed_challenges
 
 default_args = {
     "owner": "airflow",
@@ -14,8 +14,8 @@ default_args = {
 
 
 with DAG(
-    dag_id="riot_champion_mastery_entries",
-    description="Extract champion mastery entries from Riot API",
+    dag_id="riot_progressed_challenges",
+    description="Extract progressed challenges from Riot API",
     default_args=default_args,
     start_date=datetime(2026, 1, 1),
     schedule_interval=None,
@@ -23,9 +23,9 @@ with DAG(
     tags=["riot", "extract", "league"],
 ) as dag:
     PythonOperator(
-        task_id="extract_champion_mastery_entries",
-        python_callable=extract_champion_mastery_entries,
+        task_id="extract_progressed_challenges",
+        python_callable=extract_progressed_challenges,
         op_kwargs={
-            "player_puuid": "rRllmGqPRjUuZqs1Vy0AZKXhiCvRRJoXELVKM0I4-EfDQ98eNIL_R0fIFx6IS5cbGwJ7HSKjWGSqzg",
+            "player_puuid": None,
         },
     )
