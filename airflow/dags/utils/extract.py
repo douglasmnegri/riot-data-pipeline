@@ -6,6 +6,7 @@ from pathlib import Path
 from utils.client import get_json
 from utils.endpoints import get_rank_entries
 from utils.endpoints import get_player_champion_data
+from utils.endpoints import get_player_challenges
 
 DATA_DIR = Path("data/raw")
 
@@ -72,3 +73,31 @@ def extract_champion_mastery_entries(puuid_file: str) -> None:
 
         # Rate liminting protection (Riot API allows 100 requests every 2 minutes)
         time.sleep(2)
+
+
+def extract_progressed_challenges() -> None:
+    puuid_dir = DATA_DIR / "puuids"
+    challenges_dir = DATA_DIR / "progressed_challenges"
+
+    challenges_dir.mkdir(parents=True, exist_ok=True)
+
+    # Iterate over ALL puuid snapshot files
+    for puuid_file in puuid_dir.glob("*.json"):
+        with puuid_file.open("r", encoding="utf-8") as f:
+            puuids: list[str] = json.load(f)
+
+        for puuid in puuids:
+            output = challenges_dir / f"{puuid}.json"
+
+            if output.exists():
+                continue
+
+            response = get_json(get_player_challenges(puuid))
+            if not response:
+                continue
+
+            with output.open("w", encoding="utf-8") as f:
+                json.dump(response, f, indent=2)
+
+            # Riot rate limit protection
+            time.sleep(2)

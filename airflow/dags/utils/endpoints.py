@@ -40,3 +40,16 @@ def get_player_champion_data(player_puuid: str) -> str:
     )
 
     return url
+
+
+def get_player_challenges(player_puuid: str) -> str:
+    """Construct the endpoint URL for fetching player challenges
+    using challenges-v1.
+    """
+    base_url = os.getenv("BASE_URL")
+    if not base_url:
+        raise ValueError("BASE_URL environment variable is not set.")
+
+    url = f"{base_url}/lol/challenges/v1/player-data/{player_puuid}"
+
+    return url
