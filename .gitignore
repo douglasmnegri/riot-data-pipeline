@@ -14,7 +14,6 @@ env/
 # Environment variables / secrets
 # =========================
 .env
-.env.*
 *.env
 
 # =========================
