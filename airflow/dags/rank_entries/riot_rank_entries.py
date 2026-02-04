@@ -4,8 +4,11 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
-from utils.extract import extract_rank_entries
-from utils.extract import extract_champion_mastery_entries
+from utils.extract import (
+    extract_rank_entries,
+    extract_champion_mastery_entries,
+)
+from utils.blob_uploader import upload_all_raw_data_to_blob
 
 
 CONFIG_PATH = "/opt/airflow/dags/rank_entries/configs/rank_entries_jobs.json"
@@ -34,6 +37,8 @@ with DAG(
 ) as dag:
     jobs = load_jobs_config(CONFIG_PATH)
 
+    job_end_tasks = []
+
     for job in jobs:
         rank_task = PythonOperator(
             task_id=f"extract_rank_{job['task_suffix']}",
@@ -58,3 +63,11 @@ with DAG(
         )
 
         rank_task >> mastery_task
+        job_end_tasks.append(mastery_task)
+
+    upload_task = PythonOperator(
+        task_id="upload_all_raw_data_to_blob",
+        python_callable=upload_all_raw_data_to_blob,
+    )
+
+    job_end_tasks >> upload_task
