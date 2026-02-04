@@ -1,26 +1,13 @@
-name: CI
+.PHONY: ci install test lint
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+ci: install test
 
-jobs:
-  ci:
-    runs-on: ubuntu-latest
+install:
+	pip install --upgrade pip
+	pip install -r requirements.txt
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+test:
+	pytest -q
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.9"
-
-      - name: Run CI via Makefile
-        env:
-          RIOT_API_KEY: dummy
-        run: |
-          make ci
+lint:
+	ruff src tests
