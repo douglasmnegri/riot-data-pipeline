@@ -7,6 +7,7 @@ from utils.client import get_json
 from utils.endpoints import get_rank_entries
 from utils.endpoints import get_player_champion_data
 from utils.endpoints import get_player_challenges
+from utils.endpoints import get_tft_grandmaster_leaderboard
 
 DATA_DIR = Path("data/raw")
 
@@ -101,3 +102,20 @@ def extract_progressed_challenges() -> None:
 
             # Riot rate limit protection
             time.sleep(2)
+
+
+def extract_tft_grandmaster_leaderboard() -> None:
+    leaderboard_dir = DATA_DIR / "tft_grandmaster_leaderboard"
+    leaderboard_dir.mkdir(parents=True, exist_ok=True)
+
+    output = leaderboard_dir / "grandmaster_leaderboard.json"
+
+    if output.exists():
+        return
+
+    response = get_json(get_tft_grandmaster_leaderboard())
+    if not response:
+        return
+
+    with output.open("w", encoding="utf-8") as f:
+        json.dump(response, f, indent=2)
