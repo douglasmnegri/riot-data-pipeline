@@ -5,6 +5,7 @@ from airflow.operators.python import PythonOperator
 
 from utils.extract import extract_tft_grandmaster_leaderboard
 
+
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
