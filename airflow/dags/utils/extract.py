@@ -12,7 +12,7 @@ from utils.endpoints import get_tft_grandmaster_leaderboard
 DATA_DIR = Path("data/raw")
 
 
-def extract_rank_entries(
+def extract_lol_rank_entries(
     queue: str,
     tier: str,
     division: str,

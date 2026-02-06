@@ -5,7 +5,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from utils.extract import (
-    extract_rank_entries,
+    extract_lol_rank_entries,
     extract_champion_mastery_entries,
 )
 from utils.blob_uploader import upload_all_raw_data_to_blob
@@ -27,7 +27,7 @@ def load_jobs_config(path: str):
 
 
 with DAG(
-    dag_id="riot_rank_entries",
+    dag_id="riot_lol_rank_entries",
     description="Extract ranked entries and champion mastery from Riot API",
     default_args=default_args,
     start_date=datetime(2026, 1, 1),
@@ -41,8 +41,8 @@ with DAG(
 
     for job in jobs:
         rank_task = PythonOperator(
-            task_id=f"extract_rank_{job['task_suffix']}",
-            python_callable=extract_rank_entries,
+            task_id=f"extract_lol_rank_{job['task_suffix']}",
+            python_callable=extract_lol_rank_entries,
             op_kwargs={
                 "queue": job["queue"],
                 "tier": job["tier"],
@@ -55,7 +55,7 @@ with DAG(
             python_callable=extract_champion_mastery_entries,
             op_kwargs={
                 "puuid_file": (
-                    "{{ ti.xcom_pull(task_ids='extract_rank_"
+                    "{{ ti.xcom_pull(task_ids='extract_lol_rank_"
                     + job["task_suffix"]
                     + "') }}"
                 ),
