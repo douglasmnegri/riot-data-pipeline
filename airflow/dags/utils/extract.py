@@ -4,10 +4,14 @@ from datetime import datetime
 from pathlib import Path
 
 from utils.client import get_json
-from utils.endpoints import get_rank_entries
-from utils.endpoints import get_player_champion_data
-from utils.endpoints import get_player_challenges
-from utils.endpoints import get_tft_grandmaster_leaderboard
+from utils.endpoints import (
+    get_rank_entries,
+    get_player_champion_data,
+    get_player_challenges,
+    get_tft_grandmaster_leaderboard,
+    get_tft_challanger_leaderboard,
+)
+
 
 DATA_DIR = Path("data/raw")
 
@@ -114,6 +118,23 @@ def extract_tft_grandmaster_leaderboard() -> None:
         return
 
     response = get_json(get_tft_grandmaster_leaderboard())
+    if not response:
+        return
+
+    with output.open("w", encoding="utf-8") as f:
+        json.dump(response, f, indent=2)
+
+
+def extract_tft_challenger_leaderboard() -> None:
+    leaderboard_dir = DATA_DIR / "tft_challenger_leaderboard"
+    leaderboard_dir.mkdir(parents=True, exist_ok=True)
+
+    output = leaderboard_dir / "challenger_leaderboard.json"
+
+    if output.exists():
+        return
+
+    response = get_json(get_tft_challanger_leaderboard())
     if not response:
         return
 

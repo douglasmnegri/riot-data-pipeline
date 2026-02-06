@@ -64,3 +64,14 @@ def get_tft_grandmaster_leaderboard() -> str:
         raise ValueError("BASE_URL environment variable is not set.")
 
     return f"{base_url}/tft/league/v1/grandmaster"
+
+
+def get_tft_challanger_leaderboard() -> str:
+    """Construct the endpoint URL for fetching TFT challenger leaderboard
+    using league-v1.
+    """
+    base_url = os.getenv("BASE_URL")
+    if not base_url:
+        raise ValueError("BASE_URL environment variable is not set.")
+
+    return f"{base_url}/tft/league/v1/challenger"
