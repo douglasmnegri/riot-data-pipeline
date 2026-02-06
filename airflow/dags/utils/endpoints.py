@@ -75,3 +75,14 @@ def get_tft_challanger_leaderboard() -> str:
         raise ValueError("BASE_URL environment variable is not set.")
 
     return f"{base_url}/tft/league/v1/challenger"
+
+
+def get_tft_entries_by_puuid(puuid: str) -> str:
+    """Construct the endpoint URL for fetching TFT entries by PUUID
+    using league-v1.
+    """
+    base_url = os.getenv("BASE_URL")
+    if not base_url:
+        raise ValueError("BASE_URL environment variable is not set.")
+
+    return f"{base_url}/tft/league/v1/by-puuid/{puuid}"

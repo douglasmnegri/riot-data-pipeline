@@ -10,6 +10,7 @@ from utils.endpoints import (
     get_player_challenges,
     get_tft_grandmaster_leaderboard,
     get_tft_challanger_leaderboard,
+    get_tft_entries_by_puuid,
 )
 
 
@@ -135,6 +136,23 @@ def extract_tft_challenger_leaderboard() -> None:
         return
 
     response = get_json(get_tft_challanger_leaderboard())
+    if not response:
+        return
+
+    with output.open("w", encoding="utf-8") as f:
+        json.dump(response, f, indent=2)
+
+
+def extract_tft_entries_by_puuid(puuid: str) -> None:
+    entries_dir = DATA_DIR / "tft_entries"
+    entries_dir.mkdir(parents=True, exist_ok=True)
+
+    output = entries_dir / f"{puuid}.json"
+
+    if output.exists():
+        return
+
+    response = get_json(get_tft_entries_by_puuid(puuid))
     if not response:
         return
 
