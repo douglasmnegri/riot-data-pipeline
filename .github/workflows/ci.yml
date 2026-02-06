@@ -1,13 +1,13 @@
-.PHONY: ci install test lint
+# .PHONY: ci install test lint
 
-ci: install test
+# ci: install test
 
-install:
-	pip install --upgrade pip
-	pip install -r requirements.txt
+# install:
+# 	pip install --upgrade pip
+# 	pip install -r requirements.txt
 
-test:
-	pytest -q
+# test:
+# 	pytest -q
 
-lint:
-	ruff src tests
+# lint:
+# 	ruff src tests

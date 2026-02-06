@@ -14,7 +14,8 @@ from utils.endpoints import (
 )
 
 
-DATA_DIR = Path("data/raw")
+DATA_LOL_DIR = Path("data/raw/lol")
+DATA_TFT_DIR = Path("data/raw/tft")
 
 
 def extract_lol_rank_entries(
@@ -34,8 +35,8 @@ def extract_lol_rank_entries(
 
     ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
 
-    rank_dir = DATA_DIR / "rank"
-    puuid_dir = DATA_DIR / "puuids"
+    rank_dir = DATA_LOL_DIR / "rank"
+    puuid_dir = DATA_LOL_DIR / "puuids"
 
     rank_dir.mkdir(parents=True, exist_ok=True)
     puuid_dir.mkdir(parents=True, exist_ok=True)
@@ -60,7 +61,7 @@ def extract_champion_mastery_entries(puuid_file: str) -> None:
     with puuid_path.open("r", encoding="utf-8") as f:
         puuids: list[str] = json.load(f)
 
-    mastery_dir = DATA_DIR / "champion_mastery"
+    mastery_dir = DATA_LOL_DIR / "champion_mastery"
     mastery_dir.mkdir(parents=True, exist_ok=True)
 
     for puuid in puuids:
@@ -82,8 +83,8 @@ def extract_champion_mastery_entries(puuid_file: str) -> None:
 
 
 def extract_progressed_challenges() -> None:
-    puuid_dir = DATA_DIR / "puuids"
-    challenges_dir = DATA_DIR / "progressed_challenges"
+    puuid_dir = DATA_LOL_DIR / "puuids"
+    challenges_dir = DATA_LOL_DIR / "progressed_challenges"
 
     challenges_dir.mkdir(parents=True, exist_ok=True)
 
@@ -109,42 +110,63 @@ def extract_progressed_challenges() -> None:
             time.sleep(2)
 
 
+# The functions below needs to be refactored to avoid code duplication with the TFT leaderboard extraction.
 def extract_tft_grandmaster_leaderboard() -> None:
-    leaderboard_dir = DATA_DIR / "tft_grandmaster_leaderboard"
-    leaderboard_dir.mkdir(parents=True, exist_ok=True)
-
-    output = leaderboard_dir / "grandmaster_leaderboard.json"
-
-    if output.exists():
-        return
-
     response = get_json(get_tft_grandmaster_leaderboard())
     if not response:
         return
 
-    with output.open("w", encoding="utf-8") as f:
+    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+
+    rank_dir = DATA_TFT_DIR / "rank"
+    puuid_dir = DATA_TFT_DIR / "puuids"
+
+    rank_dir.mkdir(parents=True, exist_ok=True)
+    puuid_dir.mkdir(parents=True, exist_ok=True)
+
+    rank_file = rank_dir / f"tft_grandmaster_{ts}.json"
+    puuid_file = puuid_dir / f"tft_grandmaster_{ts}.json"
+
+    puuids = sorted({entry["puuid"] for entry in response["entries"]})
+
+    with rank_file.open("w", encoding="utf-8") as f:
         json.dump(response, f, indent=2)
+
+    with puuid_file.open("w", encoding="utf-8") as f:
+        json.dump(puuids, f, indent=2)
+
+    return str(puuid_file)
 
 
 def extract_tft_challenger_leaderboard() -> None:
-    leaderboard_dir = DATA_DIR / "tft_challenger_leaderboard"
-    leaderboard_dir.mkdir(parents=True, exist_ok=True)
-
-    output = leaderboard_dir / "challenger_leaderboard.json"
-
-    if output.exists():
-        return
-
     response = get_json(get_tft_challanger_leaderboard())
     if not response:
         return
 
-    with output.open("w", encoding="utf-8") as f:
+    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+
+    rank_dir = DATA_TFT_DIR / "rank"
+    puuid_dir = DATA_TFT_DIR / "puuids"
+
+    rank_dir.mkdir(parents=True, exist_ok=True)
+    puuid_dir.mkdir(parents=True, exist_ok=True)
+
+    rank_file = rank_dir / f"tft_challenger_{ts}.json"
+    puuid_file = puuid_dir / f"tft_challenger_{ts}.json"
+
+    puuids = sorted({entry["puuid"] for entry in response["entries"]})
+
+    with rank_file.open("w", encoding="utf-8") as f:
         json.dump(response, f, indent=2)
+
+    with puuid_file.open("w", encoding="utf-8") as f:
+        json.dump(puuids, f, indent=2)
+
+    return str(puuid_file)
 
 
 def extract_tft_entries_by_puuid(puuid: str) -> None:
-    entries_dir = DATA_DIR / "tft_entries"
+    entries_dir = DATA_TFT_DIR / "tft_entries"
     entries_dir.mkdir(parents=True, exist_ok=True)
 
     output = entries_dir / f"{puuid}.json"
