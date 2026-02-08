@@ -3,8 +3,10 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
-from utils.extract import extract_tft_grandmaster_leaderboard
-
+from utils.extract import (
+    extract_tft_grandmaster_leaderboard,
+    extract_tft_entries_by_puuid,
+)
 
 default_args = {
     "owner": "airflow",
@@ -23,7 +25,19 @@ with DAG(
     catchup=False,
     tags=["riot", "extract", "tft"],
 ) as dag:
-    PythonOperator(
+    leaderboard_task = PythonOperator(
         task_id="extract_tft_grandmaster_leaderboard",
         python_callable=extract_tft_grandmaster_leaderboard,
     )
+
+    player_entries_task = PythonOperator(
+        task_id="extract_tft_entries_by_puuid",
+        python_callable=extract_tft_entries_by_puuid,
+        op_kwargs={
+            "puuid_file": (
+                "{{ ti.xcom_pull(task_ids='extract_tft_grandmaster_leaderboard') }}"
+            ),
+        },
+    )
+
+    leaderboard_task >> player_entries_task

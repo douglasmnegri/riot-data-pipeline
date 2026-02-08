@@ -66,7 +66,7 @@ def get_tft_grandmaster_leaderboard() -> str:
     return f"{base_url}/tft/league/v1/grandmaster"
 
 
-def get_tft_challanger_leaderboard() -> str:
+def get_tft_challenger_leaderboard() -> str:
     """Construct the endpoint URL for fetching TFT challenger leaderboard
     using league-v1.
     """

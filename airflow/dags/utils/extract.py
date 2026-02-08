@@ -9,7 +9,7 @@ from utils.endpoints import (
     get_player_champion_data,
     get_player_challenges,
     get_tft_grandmaster_leaderboard,
-    get_tft_challanger_leaderboard,
+    get_tft_challenger_leaderboard,
     get_tft_entries_by_puuid,
 )
 
@@ -78,7 +78,7 @@ def extract_champion_mastery_entries(puuid_file: str) -> None:
         with output.open("w", encoding="utf-8") as f:
             json.dump(response, f, indent=2)
 
-        # Rate liminting protection (Riot API allows 100 requests every 2 minutes)
+        # Rate limiting protection (Riot API allows 100 requests every 2 minutes)
         time.sleep(2)
 
 
@@ -111,7 +111,7 @@ def extract_progressed_challenges() -> None:
 
 
 # The functions below needs to be refactored to avoid code duplication with the TFT leaderboard extraction.
-def extract_tft_grandmaster_leaderboard() -> None:
+def extract_tft_grandmaster_leaderboard() -> str:
     response = get_json(get_tft_grandmaster_leaderboard())
     if not response:
         return
@@ -138,8 +138,8 @@ def extract_tft_grandmaster_leaderboard() -> None:
     return str(puuid_file)
 
 
-def extract_tft_challenger_leaderboard() -> None:
-    response = get_json(get_tft_challanger_leaderboard())
+def extract_tft_challenger_leaderboard() -> str:
+    response = get_json(get_tft_challenger_leaderboard())
     if not response:
         return
 
@@ -165,18 +165,27 @@ def extract_tft_challenger_leaderboard() -> None:
     return str(puuid_file)
 
 
-def extract_tft_entries_by_puuid(puuid: str) -> None:
-    entries_dir = DATA_TFT_DIR / "tft_entries"
-    entries_dir.mkdir(parents=True, exist_ok=True)
+def extract_tft_entries_by_puuid(puuid_file: str) -> None:
+    puuid_path = Path(puuid_file)
 
-    output = entries_dir / f"{puuid}.json"
+    with puuid_path.open("r", encoding="utf-8") as f:
+        puuids: list[str] = json.load(f)
 
-    if output.exists():
-        return
+    player_details = DATA_TFT_DIR / "player_details"
+    player_details.mkdir(parents=True, exist_ok=True)
 
-    response = get_json(get_tft_entries_by_puuid(puuid))
-    if not response:
-        return
+    for puuid in puuids:
+        output = player_details / f"{puuid}.json"
 
-    with output.open("w", encoding="utf-8") as f:
-        json.dump(response, f, indent=2)
+        if output.exists():
+            continue
+
+        response = get_json(get_tft_entries_by_puuid(puuid))
+        if not response:
+            continue
+
+        with output.open("w", encoding="utf-8") as f:
+            json.dump(response, f, indent=2)
+
+        # Rate protection (Same as before)
+        time.sleep(2)
