@@ -86,3 +86,14 @@ def get_tft_entries_by_puuid(puuid: str) -> str:
         raise ValueError("BASE_URL environment variable is not set.")
 
     return f"{base_url}/tft/league/v1/by-puuid/{puuid}"
+
+
+def get_tft_match_by_puuid(puuid: str) -> str:
+    """Construct the endpoint URL for fetching TFT match history by PUUID
+    using match-v5.
+    """
+    base_url = os.getenv("BASE_URL_AMERICAS")
+    if not base_url:
+        raise ValueError("BASE_URL_AMERICAS environment variable is not set.")
+
+    return f"{base_url}/tft/match/v1/matches/by-puuid/{puuid}/ids"

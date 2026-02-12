@@ -11,6 +11,7 @@ from utils.endpoints import (
     get_tft_grandmaster_leaderboard,
     get_tft_challenger_leaderboard,
     get_tft_entries_by_puuid,
+    get_tft_match_by_puuid,
 )
 
 
@@ -181,6 +182,32 @@ def extract_tft_entries_by_puuid(puuid_file: str) -> None:
             continue
 
         response = get_json(get_tft_entries_by_puuid(puuid))
+        if not response:
+            continue
+
+        with output.open("w", encoding="utf-8") as f:
+            json.dump(response, f, indent=2)
+
+        # Rate protection (Same as before)
+        time.sleep(2)
+
+
+def extract_tft_matches_by_puuid(puuid_file: str) -> None:
+    puuid_path = Path(puuid_file)
+
+    with puuid_path.open("r", encoding="utf-8") as f:
+        puuids: list[str] = json.load(f)
+
+    match_history_dir = DATA_TFT_DIR / "match_history"
+    match_history_dir.mkdir(parents=True, exist_ok=True)
+
+    for puuid in puuids:
+        output = match_history_dir / f"{puuid}.json"
+
+        if output.exists():
+            continue
+
+        response = get_json(get_tft_match_by_puuid(puuid))
         if not response:
             continue
 
