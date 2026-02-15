@@ -8,6 +8,8 @@ from utils.extract import (
     extract_tft_match_details,
 )
 
+from utils.blob_uploader import upload_all_raw_data_to_blob
+
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
@@ -37,4 +39,9 @@ with DAG(
         python_callable=extract_tft_match_details,
     )
 
-    extract_matches_task >> extract_details_task
+    upload_task = PythonOperator(
+        task_id="upload_to_blob",
+        python_callable=upload_all_raw_data_to_blob,
+    )
+
+    extract_matches_task >> extract_details_task >> upload_task
