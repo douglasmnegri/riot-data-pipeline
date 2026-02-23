@@ -8,6 +8,8 @@ from utils.extract import (
     extract_tft_entries_by_puuid,
 )
 
+from utils.blob_uploader import upload_all_raw_data_to_blob
+
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
@@ -40,4 +42,9 @@ with DAG(
         },
     )
 
-    leaderboard_task >> player_entries_task
+    upload_task = PythonOperator(
+        task_id="upload_to_blob",
+        python_callable=upload_all_raw_data_to_blob,
+    )
+
+    leaderboard_task >> player_entries_task >> upload_task
