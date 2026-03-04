@@ -23,6 +23,7 @@ df_matches = (
             "info.game_datetime",
             "info.queueId",
             "info.endOfGameResult",
+            "info.game_length",
             "ingestion_timestamp",
             "source_file"
         )

@@ -52,9 +52,9 @@ GROUP BY t.name, t.num_units
 ORDER BY t.name, t.num_units
 """)
 
+# Average game length
 df_gold_participants = spark.sql("""
 SELECT
-    *
-FROM silver.tft_participants
-WHERE gameId = "5481988503"
-""").display()
+    CAST(AVG(game_length) / 60.0 AS DECIMAL(10,2)) AS avg_game_length
+FROM silver.tft_matches
+""")
