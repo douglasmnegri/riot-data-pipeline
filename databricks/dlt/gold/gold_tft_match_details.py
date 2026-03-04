@@ -16,9 +16,6 @@ GROUP BY name
 ORDER BY number_of_trait_appearence DESC
 """)
 
-
-
-
 df_gold_traits_placement = spark.sql("""
 SELECT
     t.name AS trait_name,
@@ -31,4 +28,13 @@ JOIN silver.tft_participants p
     AND t.puuid = p.puuid
 GROUP BY t.name, t.num_units
 ORDER BY t.name, t.num_units
-""").display()
+""")
+
+df_gold_units = spark.sql("""
+SELECT
+    character_id as unit,
+    COUNT(*) AS appearances
+FROM silver.tft_units
+GROUP BY character_id
+ORDER BY appearances DESC
+""")
