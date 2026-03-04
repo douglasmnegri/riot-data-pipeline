@@ -93,5 +93,33 @@ JOIN silver.tft_participants p
     AND t.puuid = p.puuid
 GROUP BY t.name
 ORDER BY win_rate DESC
-""").display()
+""")
 
+
+# Unit performance
+df_gold_unit_performance = spark.sql("""
+SELECT
+    u.character_id,
+    COUNT(*) AS appearances,
+    ROUND(AVG(p.placement), 2) AS avg_placement
+FROM silver.tft_units u
+JOIN silver.tft_participants p
+    ON u.gameId = p.gameId
+    AND u.puuid = p.puuid
+GROUP BY u.character_id
+ORDER BY avg_placement ASC
+""")
+
+# Item performance
+df_gold_unit_performance = spark.sql("""
+SELECT
+    ui.item_name,
+    COUNT(*) AS total_uses,
+    ROUND(AVG(p.placement), 2) AS avg_placement
+FROM silver.tft_unit_items ui
+JOIN silver.tft_participants p
+    ON ui.gameId = p.gameId
+    AND ui.puuid = p.puuid
+GROUP BY ui.item_name
+ORDER BY avg_placement ASC
+""").display()
