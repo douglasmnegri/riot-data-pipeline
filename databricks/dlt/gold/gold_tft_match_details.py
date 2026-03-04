@@ -6,7 +6,7 @@ GOLD_PLAYER_STATS_PATH = f"{GOLD_BASE_PATH}/tft_player_stats"
 GOLD_TRAIT_STATS_PATH = f"{GOLD_BASE_PATH}/tft_trait_stats"
 GOLD_UNIT_STATS_PATH = f"{GOLD_BASE_PATH}/tft_unit_stats"
 
-
+# Number of appearances of each trait
 df_gold_most_played_traits = spark.sql("""
 SELECT
     name as trait_name,
@@ -16,6 +16,7 @@ GROUP BY name
 ORDER BY number_of_trait_appearence DESC
 """)
 
+# Number of appearances of each unit and its average placement
 df_gold_traits_placement = spark.sql("""
 SELECT
     t.name AS trait_name,
@@ -30,6 +31,7 @@ GROUP BY t.name, t.num_units
 ORDER BY t.name, t.num_units
 """)
 
+# Number of appearances of each unit
 df_gold_units = spark.sql("""
 SELECT
     character_id as unit,
@@ -37,4 +39,15 @@ SELECT
 FROM silver.tft_units
 GROUP BY character_id
 ORDER BY appearances DESC
+""")
+
+# Number of appearances of each item
+df_gold_unit_items = spark.sql("""
+SELECT
+    character_id AS unit,
+    item_name AS item,
+    COUNT(item_name) AS number_of_item_appearances
+FROM silver.tft_unit_items
+GROUP BY character_id, item_name
+ORDER BY character_id, number_of_item_appearances DESC
 """)
