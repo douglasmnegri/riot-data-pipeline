@@ -16,21 +16,6 @@ GROUP BY name
 ORDER BY number_of_trait_appearence DESC
 """)
 
-# Number of appearances of each unit and its average placement
-df_gold_traits_placement = spark.sql("""
-SELECT
-    t.name AS trait_name,
-    t.num_units,
-    COUNT(*) AS appearances,
-    AVG(p.placement) AS avg_placement
-FROM silver.tft_traits t
-JOIN silver.tft_participants p
-    ON t.gameId = p.gameId
-    AND t.puuid = p.puuid
-GROUP BY t.name, t.num_units
-ORDER BY t.name, t.num_units
-""")
-
 # Number of appearances of each unit
 df_gold_units = spark.sql("""
 SELECT
@@ -51,3 +36,25 @@ FROM silver.tft_unit_items
 GROUP BY character_id, item_name
 ORDER BY character_id, number_of_item_appearances DESC
 """)
+
+# Number of appearances of each unit and its average placement
+df_gold_traits_placement = spark.sql("""
+SELECT
+    t.name AS trait_name,
+    t.num_units,
+    COUNT(*) AS appearances,
+    AVG(p.placement) AS avg_placement
+FROM silver.tft_traits t
+JOIN silver.tft_participants p
+    ON t.gameId = p.gameId
+    AND t.puuid = p.puuid
+GROUP BY t.name, t.num_units
+ORDER BY t.name, t.num_units
+""")
+
+df_gold_participants = spark.sql("""
+SELECT
+    *
+FROM silver.tft_participants
+WHERE gameId = "5481988503"
+""").display()

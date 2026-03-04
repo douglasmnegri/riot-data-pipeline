@@ -60,7 +60,7 @@ df_participants = (
             "p.total_damage_to_players",
             "ingestion_timestamp",
             "source_file"
-        )
+        ).dropDuplicates(["gameId", "puuid"])
 )
 
 # UNITS (1 row per unit)
@@ -82,7 +82,7 @@ df_units = (
             "unit.rarity",
             "ingestion_timestamp",
             "source_file"
-        )
+        ).dropDuplicates(["gameId", "puuid", "character_id"])
 )
 
 
@@ -104,7 +104,7 @@ df_unit_items = (
             explode("unit.itemNames").alias("item_name"),
             "ingestion_timestamp",
             "source_file"
-        )
+        ).dropDuplicates(["gameId", "puuid", "character_id", "item_name"])
 )
 
 
@@ -129,7 +129,7 @@ df_traits = (
             "trait.tier_total",
             "ingestion_timestamp",
             "source_file"
-        )
+        ).dropDuplicates(["gameId", "puuid", "name"])
 )
 
 
