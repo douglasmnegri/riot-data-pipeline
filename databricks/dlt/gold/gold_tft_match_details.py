@@ -111,7 +111,7 @@ ORDER BY avg_placement ASC
 """)
 
 # Item performance
-df_gold_unit_performance = spark.sql("""
+df_gold_items_performance = spark.sql("""
 SELECT
     ui.item_name,
     COUNT(*) AS total_uses,
@@ -122,4 +122,16 @@ JOIN silver.tft_participants p
     AND ui.puuid = p.puuid
 GROUP BY ui.item_name
 ORDER BY avg_placement ASC
+""")
+
+# Average elimination per minute
+df_gold_average_elimination_minute = spark.sql("""
+SELECT
+    level,
+    COUNT(*) AS players,
+    ROUND(AVG(time_eliminated) / 60.0, 2) AS avg_elimination_minute
+FROM silver.tft_participants
+GROUP BY level
+ORDER BY level
 """).display()
+
